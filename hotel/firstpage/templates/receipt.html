@@ -1,0 +1,73 @@
+{% load static %}
+
+<style>
+    .data-item{
+        font-weight: bolder;
+    }
+</style>
+
+<div
+    style="display: flex; flex-direction: column; color: rgb(120, 20, 219); max-width: 610px; gap: 5px; padding: 8px; border: 1px solid rgb(120, 20, 219);">
+    <div style="font-size: 14px; font-weight: 600; text-decoration: underline; text-align: center; margin-bottom: 4px;">RECEIPT</div>
+
+    <div style="display: flex; gap: 20px;">
+        <div>
+            <img src="{% if logo %}{{ logo }}{% else %}{% static 'logo.png' %}{% endif %}" style="min-width: 50px; max-width: 50px;" alt="">
+
+        </div>
+        <div style="display: flex; flex-direction: column; text-align: center; gap: 2px; font-size: 13px;">
+            <div style="font-weight: 500;">Guru Kripa Institute of Management & Information Technology</div>
+            <div>An ISO 9001 : 2015 Certified, IT Based Software Developer & Professional Training Centre</div>
+            <div>MANAGED BY : GURU KRIPA EDUCATIONAL SOCIETY</div>
+        </div>
+    </div>
+
+    <div style="font-size: 12px; display: flex; flex-direction: column; gap: 5px; margin-top: 4px;">
+        <div style="display: flex; justify-content: space-between;">
+            <div>No: <span class="data-item">{{receipt_number}}</span></div>
+            <div>Dated: <span class="data-item">{{date}}</span></div>
+        </div>
+
+        <div style="line-height: 1.2rem;">
+            Received a sum of Rs <span class="data-item"
+                style="width: 450px; display: inline-block; text-align: left; border-bottom: 1px solid rgb(120, 20, 219);">{{fees_amount_in_words}}</span>
+            from
+            <br>
+            Mr./Miss <span  class="data-item"
+                style="width: 120px; display: inline-block; text-align: left; border-bottom: 1px solid rgb(120, 20, 219);">{{student_name}}</span>
+            S/o, W/o, D/o of Sh. <span  class="data-item"
+                style="width: 312px; display: inline-block; text-align: left; border-bottom: 1px solid rgb(120, 20, 219);">{{father_name}}</span>
+            <br>
+            R/O <span  class="data-item"
+                style="width: 565px; display: inline-block; text-align: left; border-bottom: 1px solid rgb(120, 20, 219);">{{address}}</span>
+            <br>
+            on account of Tuition Fee.
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 6px;">
+            <div style="display: flex;">
+
+                <div
+                    style="background-color: rgb(120, 20, 219); color: white; display: flex; align-items: center; border-radius: 5px; padding: 4px;">
+                    Rs</div>
+                <div class="data-item"
+                    style="display: flex; align-items: center; border: 1px solid rgb(120, 20, 219); border-radius: 4px; width: 200px; padding: 5px;">
+                    {{fees_amount}}</div>
+
+            </div>
+            <div>
+                For GURU KRIPA INSTITUTE OF <br> MGT. & IT
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 12px; padding-top: 8px;">
+            <div>SHAHEED NARESH CHOWK, SUNDER NAGAR, <br>Distt. Mandi (H.P.) Mob.: 98171-62762</div>
+            <div style="display: flex; align-items: center; flex-direction: column;">
+                <div>
+                    <img src="{% if signature %}{{ signature }}{% else %}{% static 'signature.jpg' %}{% endif %}" style="min-width: 80px; max-width: 80px;" alt="">
+                </div>
+                <div style="white-space: nowrap;">Authorized Signatory</div>
+            </div>
+        </div>
+    </div>
+</div>

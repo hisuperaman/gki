@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block body %}
+
+<div class="container-fluid">
+
+  <div class="row content">
+
+
+    <div class="col-sm-9">
+      <div class="well">
+        <img src="{% static 'dd.jpg' %}" width="100%" height="80">
+
+      </div>
+      <div class="row">
+        <div style="width:380px;" class="col-sm-3">
+          <div class="well" width="500px">
+            <h4>Diploma Course</h4>
+
+            <button class="accordion">PGDCA</button>
+            <div class="panel">
+              <p>
+                <img src="{% static 'pgdca.jpg' %}" width="100%" height="400px" style="max-height: 380px;">
+
+              </p>
+            </div>
+
+
+          </div>
+        </div>
+        <div style="width:380px;" class="col-sm-3">
+          <div class="well">
+            <h4>Diploma Course</h4>
+
+            <button class="accordion">DCA</button>
+            <div class="panel">
+              <p>
+                <img src="{% static 'dca.jpg' %}" width="100%" height="400px" style="max-height: 380px;">
+
+              </p>
+            </div>
+
+          </div>
+        </div>
+        <div style="width:100%;" class="col-sm-3">
+          <div class="well">
+            <h4>Certificate Course</h4>
+
+
+            <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+              <div>
+                <button class="accordion">All Certificate Courses</button>
+                <div class="panel">
+                  <p>
+                    <img src="{% static 'certificate.jpg' %}" width="100%" height="400px" style="max-height: 380px;">
+  
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <button class="accordion">All Certificate Courses</button>
+                <div class="panel">
+                  <p>
+                    <img src="{% static 'course1.jpg' %}" width="100%" height="400px" style="max-height: 380px;">
+  
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <button class="accordion">All Certificate Courses</button>
+                <div class="panel">
+                  <p>
+                    <img src="{% static 'course3.jpg' %}" width="100%" height="400px" style="max-height: 380px;">
+  
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <button class="accordion">All Certificate Courses</button>
+                <div class="panel">
+                  <p>
+                    <img src="{% static 'course2.jpg' %}" width="100%" height="400px" style="max-height: 380px;">
+  
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="width:1158px;" class="col-sm-4">
+            <div class="well">
+              <p><img src="{% static 'industrail.jpg' %}" width="100%" height="264"></p>
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+      <div>
+
+        INDUSTRIAL TRAINING
+
+        In these days, simply having a degree is not an agreement of employment, nor it is a positive indicator of the
+        particular scope in a job. Maximum of the graduates must have always current and good relevant knowledge,
+        practical experience, soft skills, more dedication and focus on the work, as this positive attitude will allow
+        them to be competitive in the job market. The Industrial Training component of the undergraduate curriculum
+        integrates a fundamental component in the drive to strengthen the key ability, required to improve the
+        graduate's capacity to work.
+
+      </div>
+
+      <script>
+        var acc = document.getElementsByClassName("accordion");
+        var i;
+
+        for (i = 0; i < acc.length; i++) {
+          acc[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+              panel.style.maxHeight = null;
+            } else {
+              panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+          });
+        }
+      </script>
+
+      {% endblock %}

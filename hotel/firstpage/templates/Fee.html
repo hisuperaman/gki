@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block body %}
+
+<div class="container-fluid">
+    <div class="col-sm-9">
+      <div class="well">
+        <img src="{% static 'dd.jpg' %}"   width="100%" height="80"  >
+
+      </div>
+
+      <form method="POST">
+
+        {% csrf_token %}
+
+          <center>Enter Students Roll No : <input type="text" name='roll_number' id="roll_no" >&nbsp&nbsp<button type="button" onclick="searchBtnClick()">Search</button><br>
+         </center><br><div  class="col-sm-9" style="width: 100%;">
+              <div style="border: 20px solid #F5F5F5;" id="mainDiv">
+        
+                  <center><h3>Fee Deposited Window </h3> Students can make use of digital payment methods to pay fee.</center><br>
+        
+        &nbsp &nbsp &nbsp &nbsp Name : &nbsp &nbsp &nbsp<input type="text" name='Name' id="name" > &nbsp &nbsp &nbsp &nbsp &nbsp<b>Father's Name: &nbsp &nbsp &nbsp<input type="text" name='fname' id="fathername">
+        <br><br>&nbsp <input type="text" name='Name' required placeholder="Address" id="address" style="width: 70%; margin-left: 15px;">
+        
+        <br>
+        <br>&nbspCourse:&nbsp &nbsp &nbsp&nbsp  <select id="course"><option>Search first</option></select>&nbsp &nbsp &nbsp  <label for="depdate">Fee Deposited Date :&nbsp &nbsp &nbsp</label>
+        <input type="date" id="datepicker" name="deposit_date"> &nbsp &nbsp &nbsp
+         Fee :&nbsp &nbsp &nbsp 
+         <select name="fee_amount">
+            <option value="800">800</option>
+            <option value="1000">1000</option>
+            <option value="1200">1200</option>
+            <option value="1500">1500</option>
+        </select>&nbsp &nbsp &nbsp 
+         <button type="submit">submit</button>
+              </b>
+
+            </form>
+         <div class="imageBox1" style="max-height: 400px;">
+                <p><img id="pfp" width="100px" height="100px" style="max-width: 200px; max-height: 200px;margin-top:-150px; float:right; margin-right:120px;" /></p>
+        
+              </div></div><br><br>
+                  <div style="border: 20px solid #F5F5F5;">
+                      1. Fees are to be deposited bank branches only. A Fee Book will be issued at the
+        beginning of the session indicating the bank branches in which fees can be
+        deposited.<br>
+        2. Quarterly Education & Transport fees are payable by pay-order / DD only.<br>
+        3. Fees are to be paid quarterly as per the following schedule:
+        1st Quarterly – by 5th April
+        2nd Quarterly – by 5th July
+        3rd Quarterly – by 5th October
+        4th Quarterly – by 5thJanuary
+        <br>4. If fees are not deposited in time, a late fine of Rs. 100/- will be charged for the
+        first 5 days of default, Rs. 250/- for the next 5 days and for 10 days the fine will be
+        Rs. 500/-
+          </div>
+              </div>
+      </div></div>
+
+
+
+<script type="text/javascript">
+  var loadFile = function(event) {
+    var image = document.getElementById('output');
+    image.src = URL.createObjectURL(event.target.files[0]);
+  };
+</script>
+
+<script>
+
+    async function searchBtnClick(){
+        const rollNo = document.getElementById('roll_no').value;
+
+        if(rollNo!=''){
+            const response = await fetch(`/get_student_by_roll_no?rollNo=${rollNo}`);
+            if(response.ok){
+                const data = await response.json();
+                console.log(data);
+                document.getElementById('name').value = data.name;
+                document.getElementById('address').value = data.address;
+                document.getElementById('fathername').value = data.fathername;
+                document.getElementById('pfp').src = data.pfp;
+
+                document.getElementById('course').innerHTML = `<option>${data.courses_applied[0]}</option>`;
+            }
+        }
+        else{
+            console.log('error')
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const datepicker = document.getElementById('datepicker');
+
+    // Create a new Date object (automatically set to current date)
+    const currentDate = new Date();
+
+    // Format the current date as YYYY-MM-DD (required format for input type="date")
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero if needed
+    const day = currentDate.getDate().toString().padStart(2, '0'); // Add leading zero if needed
+
+    const formattedDate = `${year}-${month}-${day}`;
+
+    // Set the value of the input to the formatted current date
+    datepicker.value = formattedDate;
+});
+
+</script>
+
+
+{% endblock %}
