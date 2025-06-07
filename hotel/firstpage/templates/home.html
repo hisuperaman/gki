@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block body %}
+<div class="col-sm-9 page">
+
+    <div class="well">
+        <img src="{% static 'dd.jpg' %}"   width="100%" height="80"  >
+      </div>
+
+
+<!--<div class="well" style=" height: 300px;  width: 1115px; padding: 0;   border: 1px solid #4CAF50;">-->
+<!--  <img style=" margin-left: 20px; margin-top: 20px;" class="mySlides" src=" {% static 'slide1.jpg' %}" >-->
+<!--  <img class="mySlides" src="{% static ' ' %} " >-->
+<!--  <img class="mySlides" src="{% static ' ' %} " >-->
+<!--</div>-->
+
+    <div class="well" style=" height: 340px;  width: 100%; padding: 0;   border: 20px solid #F5F5F5;border-radius:50px 20px;">
+  <img width="100%" height="300px" class="mySlides" src=" {% static 'slide1.jpg' %}" style="border-radius:50px 20px;">
+  <img width="100%" height="300px" class="mySlides" src="{% static 'slide2.jpg' %} " style="border-radius:50px 20px;" >
+  <img width="100%" height="300px" class="mySlides" src="{% static 'slide3.jpg' %} " style="border-radius:50px 20px;" >
+  <img width="100%" height="300px" class="mySlides" src="{% static 'slide4.jpg' %} " style="border-radius:50px 20px;">
+   <img width="100%" height="300px" class="mySlides" src="{% static 'slide6.jpg' %} " style="border-radius:50px 20px;">
+  <img width="100%" height="300px" class="mySlides" src="{% static 'SLIDE7.jpg' %} " style="border-radius:50px 20px;" >
+ <img width="100%" height="300px" class="mySlides" src="{% static 'SLIDE9.jpg' %} " style="border-radius:50px 20px;" >
+  <img width="100%" height="300px" class="mySlides" src="{% static 'SLIDE10.jpg' %} " style="border-radius:50px 20px;">
+
+    </div>
+<div class="well" style=" height: 340px;  width: 100%; padding: 0;   border: 20px solid #F5F5F5;">
+
+
+<center><b>AISECT</b> <br></center>
+<p align="justify"><font size="4"> Aisect is a top Indian social enterprise focused on skill development, higher education, financial inclusion, e-governance, and other ICT services in semi-urban and rural areas. Since 1985, the Bhopal-based organization has tirelessly served remote regions for 37 years, empowering people, creating jobs for youth, and promoting entrepreneurship.
+
+The refined over time AISECT model is self-sustaining, scalable, and entrepreneurial, seamlessly meeting the demands of local communities for various skills and ICT services. It has a wide reach, operating in 605 districts, 2100 blocks, and 8550 Panchayats across 29 states and 4 territories through over 31000 centers and offices. Till date, we’ve trained over 26 lakh people, created jobs for over 100,000, and improved the lives of over 50 lakh people through innovative products and services.
+AISECT Multi-Purpose Model
+
+Our widespread network and wide range of service offerings are testament to the success that our business model has achieved over
+the years. The jobs that AISECT has generated directly or indirectly at the district. block and panchayat levels should be considered to be our greatest achievement. Our network has generated over 20,000 rural entrepreneurs, indirectly employing over 1.00,000 people, while our various vocational courses have helped lakhs
+of people from all sections of society, including students, housewives, government officials, working professionals or below poverty line youth enhance their skills and gain access to better prospects.<br>
+</p></font>
+</div>
+
+    <div class="well" style=" height: 600px;  width: 100%; padding: 0;   border: 20px solid #F5F5F5;">
+    <img src="{% static 'footer.png' %}"   width="100%" height="560"  >
+    <br>
+
+</div>
+<script>
+var myIndex = 0;
+carousel();
+
+function carousel() {
+  var i;
+  var x = document.getElementsByClassName("mySlides");
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";
+  }
+  myIndex++;
+  if (myIndex > x.length) {myIndex = 1}
+  x[myIndex-1].style.display = "block";
+  setTimeout(carousel, 3000); // Change image every 2 seconds
+}
+</script>
+{% endblock %}

@@ -1,0 +1,566 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block css %}
+<style>
+    .container {
+        max-width: 1000px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th,
+    td {
+        padding: 12px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    tbody tr {
+        cursor: pointer;
+    }
+
+    th {
+        background-color: #f4f4f4;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .photo {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        padding-top: 60px;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 700px;
+        border-radius: 8px;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+
+    .search-container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 0 10px;
+        position: relative;
+    }
+
+    #search-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    .results-container {
+        margin-top: 10px;
+    }
+
+    .results-container div {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: white;
+        cursor: pointer;
+    }
+
+    .results-container div:hover {
+        background-color: #f0f0f0;
+    }
+</style>
+{% endblock css %}
+
+
+{% block body %}
+
+<div class="col-sm-9">
+
+    <div class="well">
+        <img src="{% static 'dd.jpg' %}" width="100%" height="80">
+
+    </div><br>
+
+    <div class="container">
+        <h1>Student Information</h1>
+
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search..." autocomplete="off">
+            <div id="search-results" class="results-container"></div>
+        </div>
+
+        <table id="studentsTable">
+            <thead>
+                <tr>
+                    <th>ROLL NO</th>
+                    <th>FULL NAME</th>
+                    <th>MOBILE NUMBER</th>
+                    <th>PHOTO</th>
+                    <th>TOTAL FEE PAID</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+
+
+
+                <!-- Repeat <tr> block for more students -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- The Modal -->
+<div id="studentModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Student Details</h2>
+        <div id="modalBody">
+            <!-- Details will be inserted here via JavaScript -->
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    const studentsListString = '{{students|safe}}';
+    let students = JSON.parse(studentsListString);
+
+
+    const table = document.getElementById('studentsTable');
+    const modal = document.getElementById('studentModal');
+    const closeBtn = document.querySelector('.close');
+    const modalBody = document.getElementById('modalBody');
+
+
+    const tableBody = document.getElementById('table-body');
+
+    students.map((student, index) => {
+        tableBody.innerHTML += `<tr data-id="${student.rollnumber}">
+                                <td>${student.rollnumber}</td>
+                                <td>${student.fullname}</td>
+                                <td>${student.mobile_number}</td>
+                                <td><img src="${student.pfp ? student.pfp : ''}" alt="pfp" class="photo"></td>
+                                <td>${student.total_fee}</td>
+                                <td style="display: flex; flex-direction: column; gap: 5px;">
+                                    <button onclick="openEditModal(event, ${student.rollnumber})" style="background-color: #28a745; width: 40px; color: white; padding: 8px; border: none; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; justify-content: center;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                                        </svg>    
+                                    </button>
+                                    <button onclick="openDeleteModal(event, ${student.rollnumber})" style="background-color: red; width: 40px; color: white; padding: 8px; border: none; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; justify-content: center;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                                        </svg>    
+                                    </button>
+                                </td>
+                            </tr>`;
+    })
+
+    function openDeleteModal(e, roll_no) {
+        e.stopPropagation();
+        modalBody.innerHTML = `
+        <form action="/delete_student" method="post" style="margin-bottom: 20px;">
+            {% csrf_token %}
+            <input type="hidden" name="roll_number" value="${roll_no}">
+            <p>Are you sure you want to delete the student with Roll No: <strong>${roll_no}</strong>?</p>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <button type="button" onclick="closeDeleteModal()" style="
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            ">Cancel</button>
+            
+            <button type="submit" style="
+                background-color: #dc3545;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-right: 10px;
+            ">Delete</button>
+        </form>`;
+        modal.style.display = 'block'
+    }
+
+    function closeDeleteModal() {
+        modal.style.display = 'none'
+    }
+
+    function openEditModal(e, rollnumber) {
+        e.stopPropagation();
+        const student = students.find(s=>s.rollnumber==rollnumber);
+
+
+        modalBody.innerHTML = `
+        <form enctype="multipart/form-data" action="/update_student" method="post">
+    {% csrf_token %}
+    <div style="max-width: 900px; margin: auto;">
+
+        <input type="hidden" name="roll_number" value="${student.rollnumber}" >
+        
+        <div style="margin-bottom: 15px;">
+            <label for="full-name" style="display: block; margin-bottom: 5px;">FULL NAME</label>
+            <input type="text" id="full-name" name="full_name" value="${student.fullname}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="dob" style="display: block; margin-bottom: 5px;">DATE OF BIRTH</label>
+            <input type="date" id="dob" name="dob" value="${student.dob}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="email" style="display: block; margin-bottom: 5px;">EMAIL ID</label>
+            <input type="email" id="email" name="email" value="${student.email}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="mobile" style="display: block; margin-bottom: 5px;">MOBILE NUMBER</label>
+            <input type="tel" id="mobile" name="mobile" value="${student.mobile_number}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>GENDER</label>
+            <div style="display: flex; gap: 5%;">
+                <div style="display: flex;">
+                    <label for="male" style="margin-right: 5px;"><input type="radio" id="male" name="gender" value="Male" required> Male</label>
+                </div>
+                <div style="display: flex;">
+                    <label for="female" style="margin-right: 5px;"><input type="radio" id="female" name="gender" value="Female" required> Female</label>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="father-name" style="display: block; margin-bottom: 5px;">FATHER'S NAME</label>
+            <input type="text" id="father-name" name="father_name" value="${student.fathername}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="address" style="display: block; margin-bottom: 5px;">ADDRESS</label>
+            <textarea id="address" name="address" rows="4" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">${student.address}</textarea>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="photo" style="display: block; margin-bottom: 5px;">UPLOAD PHOTO</label>
+            <input type="file" id="photo" name="photo" accept="image/*" onchange="validateImage(event)" style="width: 100%;">
+            <div id="photo-preview" style="margin-top: 15px; display: block;">
+                <img id="photo-img" alt="Photo Preview" src="${student.pfp ? student.pfp : ''}" style="max-width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div id="photo-error" class="error-message" style="color: red; font-size: 14px; margin-top: 5px;"></div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>QUALIFICATION</label>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #ddd; padding: 8px; background-color: #f4f4f4;">Sl.No.</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; background-color: #f4f4f4;">Examination</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; background-color: #f4f4f4;">Board</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; background-color: #f4f4f4;">Percentage</th>
+                        <th style="border: 1px solid #ddd; padding: 8px; background-color: #f4f4f4;">Year of Passing</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Class X</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="board_x" value="${student.class10_details.board}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="percentage_x" value="${student.class10_details.percentage}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="year_x" value="${student.class10_details.year_of_passing}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">2</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Class XII</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="board_xii" value="${student.class12_details.board}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="percentage_xii" value="${student.class12_details.percentage}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="year_xii" value="${student.class12_details.year_of_passing}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">3</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Graduation</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="board_graduation" value="${student.graduation_details.board}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="percentage_graduation" value="${student.graduation_details.percentage}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="year_graduation" value="${student.graduation_details.year_of_passing}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">4</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Masters</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="board_masters" value="${student.masters_details.board}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="percentage_masters" value="${student.masters_details.percentage}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                        <td style="border: 1px solid #ddd; padding: 8px;"><input type="text" name="year_masters" value="${student.masters_details.year_of_passing}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label>COURSES APPLIED FOR</label>
+            <div style="display: flex; gap: 20px;">
+                <label for="bca" style="display: flex; align-items: center;"><input type="checkbox" id="bca" name="courses" value="BCA" style="margin-right: 5px; ${student.courses_applied.includes('BCA') ? 'checked' : ''}"> BCA</label>
+                <label for="dca" style="display: flex; align-items: center;"><input type="checkbox" id="dca" name="courses" value="DCA" style="margin-right: 5px;" ${student.courses_applied.includes('DCA') ? 'checked' : ''}> DCA</label>
+                <label for="pgdca" style="display: flex; align-items: center;"><input type="checkbox" id="pgdca" name="courses" value="PGDCA" style="margin-right: 5px;" ${student.courses_applied.includes('PGDCA') ? 'checked' : ''}> PGDCA</label>
+                <label for="o-level" style="display: flex; align-items: center;"><input type="checkbox" id="o-level" name="courses" value="O Level" style="margin-right: 5px;" ${student.courses_applied.includes('O Level') ? 'checked' : ''}> O Level</label>
+                <label for="accounts-tally" style="display: flex; align-items: center;"><input type="checkbox" id="accounts-tally" name="courses" value="Accounts Tally" style="margin-right: 5px;" ${student.courses_applied.includes('Accounts Tally') ? 'checked' : ''}>Accounts Tally</label>
+                <label for="basic" style="display: flex; align-items: center;"><input type="checkbox" id="basic" name="courses" value="Basic" style="margin-right: 5px;" ${student.courses_applied.includes('Basic') ? 'checked' : ''}> Basic</label>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <button type="submit" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Submit</button>
+        </div>
+    </div>
+    </form>
+    `;
+
+        document.getElementById(student.gender.toLowerCase()).checked = true;
+
+        modal.style.display = 'block'
+
+    }
+
+    table.addEventListener('click', (event) => {
+        const row = event.target.closest('tr');
+        if (row) {
+            const id = row.getAttribute('data-id');
+            const student = students.find(s => s.rollnumber == id);
+            if (student) {
+                console.log('yes')
+
+                modalBody.innerHTML = `
+<img src="${student.pfp ? student.pfp : ''}" alt="${student.fullname}" class="photo" style="float: right;">
+<p><strong>Roll Number:</strong> ${student.rollnumber}</p>
+<p><strong>Full Name:</strong> ${student.fullname}</p>
+<p><strong>Date of Birth:</strong> ${student.dob}</p>
+<p><strong>Email ID:</strong> ${student.email}</p>
+<p><strong>Mobile Number:</strong> ${student.mobile_number}</p>
+<p><strong>Gender:</strong> ${student.gender}</p>
+<p><strong>Father's Name:</strong> ${student.fathername}</p>
+<p><strong>Address:</strong> ${student.address}</p>
+<p><strong>Qualification:</strong></p>
+
+<ul>
+    <li><strong>Class 10</strong></li>
+    <div style="display: flex; justify-content: space-between;">
+
+        <div>Board: ${student.class10_details.board}</div>
+        <div>Percentage: ${student.class10_details.percentage}</div>
+        <div>Year of Passing: ${student.class10_details.year_of_passing}</div>
+    </div>
+
+    <li><strong>Class 12</strong></li>
+    <div style="display: flex; justify-content: space-between;">
+
+        <div>Board: ${student.class12_details.board}</div>
+        <div>Percentage: ${student.class12_details.percentage}</div>
+        <div>Year of Passing: ${student.class12_details.year_of_passing}</div>
+    </div>
+
+    <li><strong>Graduation</strong></li>
+    <div style="display: flex; justify-content: space-between;">
+
+        <div>Board: ${student.graduation_details.board}</div>
+        <div>Percentage: ${student.graduation_details.percentage}</div>
+        <div>Year of Passing: ${student.graduation_details.year_of_passing}</div>
+    </div>
+
+    <li><strong>Masters</strong></li>
+    <div style="display: flex; justify-content: space-between;">
+
+        <div>Board: ${student.masters_details.board}</div>
+        <div>Percentage: ${student.masters_details.percentage}</div>
+        <div>Year of Passing: ${student.masters_details.year_of_passing}</div>
+    </div>
+</ul>
+
+<p><strong>Courses Applied For:</strong></p>
+<ul>
+    ${student.courses_applied.map(c => `<li>${c}</li>`).join('')}
+</ul>
+
+`;
+                modal.style.display = 'block';
+            }
+        }
+    });
+
+    closeBtn.onclick = () => {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = (event) => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
+
+
+
+<script type="text/javascript">
+    var loadFile = function (event) {
+        var image = document.getElementById('output');
+        image.src = URL.createObjectURL(event.target.files[0]);
+    };
+</script>
+
+<script>
+    function validateImage(event) {
+        const file = event.target.files[0];
+        const errorElement = document.getElementById('photo-error');
+        const preview = document.getElementById('photo-preview');
+        const img = document.getElementById('photo-img');
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function () {
+                const image = new Image();
+                image.src = reader.result;
+
+                image.onload = function () {
+                    if (image.width === 200 && image.height === 200) {
+                        img.src = reader.result;
+                        preview.style.display = 'block';
+                        errorElement.textContent = ''; // Clear previous errors
+                    } else {
+                        document.getElementById('photo').value = ''
+                        preview.style.display = 'none';
+                        errorElement.textContent = 'Image must be exactly 200x200 pixels.';
+                    }
+                };
+
+                image.onerror = function () {
+
+                    preview.style.display = 'none';
+                    errorElement.textContent = 'Error loading image.';
+                };
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+            errorElement.textContent = '';
+        }
+    }
+</script>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-input');
+        const resultsContainer = document.getElementById('search-results');
+        let debounceTimer;
+
+        searchInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+
+            debounceTimer = setTimeout(() => {
+                const query = searchInput.value.trim();
+
+                fetch(`{% url 'firstpage:searchStudent' %}?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayResults(data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        resultsContainer.innerHTML = '<div>Error fetching results.</div>';
+                    });
+
+            }, 500); // 0.5 second debounce
+        });
+
+        function displayResults(data) {
+            if (data.length > 0) {
+                tableBody.innerHTML = data.map((student, index) => `<tr data-id="${student.rollnumber}">
+                                <td>${student.rollnumber}</td>
+                                <td>${student.fullname}</td>
+                                <td>${student.email}</td>
+                                <td>${student.mobile_number}</td>
+                                <td><img src="${student.pfp ? student.pfp : ''}" alt="pfp" class="photo"></td>
+                                <td style="display: flex; flex-direction: column; gap: 5px;">
+                                    <button onclick="openEditModal(event, ${student.rollnumber})" style="background-color: #28a745; width: 40px; color: white; padding: 8px; border: none; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                                        </svg>    
+                                    </button>
+                                    <button onclick="openDeleteModal(event, ${student.rollnumber})" style="background-color: red; width: 40px; color: white; padding: 8px; border: none; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                                        </svg>    
+                                    </button>
+                                </td>
+                            </tr>`).join('');
+                resultsContainer.innerHTML = ''
+            } else {
+                resultsContainer.innerHTML = '<div>No results found.</div>';
+            }
+        }
+    });
+
+</script>
+
+
+
+{% endblock body %}
