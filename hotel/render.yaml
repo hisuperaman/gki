@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: gurukripainstitution
+    env: python
+    buildCommand: "./manage.py collectstatic --noinput"
+    startCommand: "gunicorn hotel.wsgi:application"
+    staticPublishPath: staticfiles
