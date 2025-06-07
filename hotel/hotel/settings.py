@@ -75,19 +75,21 @@ WSGI_APPLICATION = 'hotel.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'gki',
+#         'USER': 'gki_user',
+#         'PASSWORD': '0SHjHR8otjA3DKMWFoZBbklCtrzRqeVh',
+#         'HOST': 'dpg-d121bpumcj7s73ersdng-a',
+#         'PORT': '5432',
+#     }
+# }
+
+import dj_database_url
+
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'your_db_name',
-        'USER': 'your_username',
-        'PASSWORD': 'your_password',
-        'HOST': 'your_db_host',  # e.g., '127.0.0.1' or remote IP
-        'PORT': '3306',          # default MySQL port
-    }
+    'default': dj_database_url.parse('postgresql://gki_user:0SHjHR8otjA3DKMWFoZBbklCtrzRqeVh@dpg-d121bpumcj7s73ersdng-a.oregon-postgres.render.com/gki')
 }
 
 
